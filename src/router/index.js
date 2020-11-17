@@ -1,27 +1,71 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Home from '../views/Home.vue'
+
 
 Vue.use(VueRouter)
 
 const routes = [
-  {
-    path: '/',
-    name: 'Home',
-    component: Home
-  },
-  {
-    path: '/about',
-    name: 'About',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
-  }
+ {
+   path:'/',
+   name:'home',
+   component:()=>import('../views/home/home.vue'),
+   children:[
+     {
+     path:'/discover',
+     name:'discover',
+     component:()=>import('../views/home/recomand/Recomand.vue'),
+     alias:'/'
+     },
+     {
+       path:'/discover/playlist',
+       component:()=>import('../views/home/homeprops/songpage/SongPage.vue')
+     },
+     {
+       path:'/discover/album',
+       component:()=>import('../views/home/homeprops/newsonggrounding/NewSongGround'),
+       children:[
+         {
+           path:'m',
+           component:()=>import('../views/home/homeprops/newsonggrounding/newsonggroundingprops/catitem'),
+           alias:'/discover/album'
+         }
+       ]
+
+     },
+     {
+       path:'/user',
+       component:()=>import('../views/home/homeprops/user/User.vue'),
+       children:[
+         {
+           path:'home',
+           component:()=>import('../views/home/homeprops/user/userProps/UserHome.vue')
+         },
+         {
+           path:'event',
+           component:()=>import('../views/home/homeprops/user/userProps/UserEvent.vue')
+         },
+         {
+           path:'fllows',
+           component:()=>import('../views/home/homeprops/user/userProps/UserFllows.vue')
+         },
+         {
+           path:'fans',
+           component:()=>import('../views/home/homeprops/user/userProps/UserFans.vue')
+         }
+       ]
+     }
+
+    
+    ]
+   
+ },
+ 
 ]
 
 const router = new VueRouter({
-  routes
+  routes,
+  
+
 })
 
 export default router
