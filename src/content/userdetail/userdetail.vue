@@ -8,7 +8,7 @@
     <div class="details">
         <div class="header">
          <span class="nickname">{{profile.nickname}}</span>
-         <a href="javascript:;" class="setingprofile">编辑个人资料</a>
+         <a href="javascript:;" class="setingprofile" @click="tousersetting()">编辑个人资料</a>
         </div>
         <div class="center">
           <div class="ceter-item" @click="touserevent()">
@@ -90,10 +90,13 @@ methods: {
         this.$router.push({path:'/user/event',query:{id:JSON.parse(window.localStorage.getItem('loginstate')).userId }})
     },
     touserfllows(){
-       this.$router.push({path:'/user/fllows',query:{id:JSON.parse(window.localStorage.getItem('loginstate')).userId }})
+       this.$router.push({path:'/user/follows',query:{id:JSON.parse(window.localStorage.getItem('loginstate')).userId }})
     },
     touserfans(){
         this.$router.push({path:'/user/fans',query:{id:JSON.parse(window.localStorage.getItem('loginstate')).userId }})
+    },
+    tousersetting(){
+        this.$router.push('update')
     }
 
 },

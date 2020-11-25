@@ -111,7 +111,9 @@ export default {
     };
   },
   created() {
-      this.query.cat=this.$route.query.cat
+      if(this.$route.query.cat!=null){
+          this.query.cat=this.$route.query.cat
+      }
       this.getmuscicard()
   },
   components: {
@@ -125,8 +127,14 @@ export default {
   },
   watch:{
       $route(){
+          if(this.$route.query.cat!=null){
         this.query.cat=this.$route.query.cat
         this.query.order=this.$route.query.order
+    
+          }else{
+              this.query.cat='全部'
+          }
+        
         this.getmuscicard()
       }
   },

@@ -43,7 +43,7 @@
                      <span>VIP会员</span></a>
                      
                  </div>
-                 <div class="setting-item">
+                 <div class="setting-item" @click="tousersetting()">
                       <a href="javascript:;"><img src="@/assets/Image/set1.svg" alt="">
                      <span>个人设置</span></a>
                      
@@ -123,6 +123,11 @@ export default {
   methods:{
       isactive(index){
           this.currentIndex=index
+          switch(index){
+              case 0:
+                  this.$router.push('/')
+                  break
+          }
       },
       inputblur(){
        this.$refs.input.placeholder='音乐/视频电台/用户'
@@ -141,6 +146,7 @@ export default {
       },
       exitmusci(){
           if(window.localStorage.getItem('loginstate')){
+              this.$emit('exitmusci')
               window.localStorage.removeItem('loginstate')
               window.localStorage.removeItem('cookie')
               this.loginstate={}
@@ -150,11 +156,20 @@ export default {
               console.log(this.profiles)
               console.log(this.loginstate)
               this.$forceUpdate()
+              if(this.$route.meta.requireauth){
+                   this.$router.push('/')
+              }
+              this.$message.success('退出登录成功')
+
+             
           }
        
       },
       toUserhome(){
           this.$emit('toUserhome')
+      },
+      tousersetting(){
+          this.$router.push({path:'/user/update'})
       }
      
       

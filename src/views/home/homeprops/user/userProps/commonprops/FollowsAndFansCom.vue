@@ -1,12 +1,6 @@
 <!--  -->
 <template>
-<div class='user-fllows'>
-  <userdetails :profile="profile"></userdetails>
-  <div class="tabbar">
-      <span>关注({{follows.length}})</span>
-  </div>
-  <followsandfanscom :follows="follows"></followsandfanscom>
-  <!-- <div class="follows-wrapper">
+    <div class="follows-wrapper">
       <div class="follows-items" v-for="(item,index) in follows" :key="item.userId">
           <div class="item-left">
             <a href="javascript:;"><img :src="item.avatarUrl" alt=""></a> 
@@ -29,42 +23,36 @@
              </div>
           </div>
           <div class="item-right">
-              <a href="javascript:;"><div class="send-button"><span>发私信</span> </div></a>
-              <div>
+              <a href="javascript:;"><div :class="{sendbutton:$route.path.indexOf('follows')!=-1,sendbuttonfans:$route.path.indexOf('fans')!=-1}" ><span v-if="$route.path.indexOf('follows')!=-1">发私信</span> <span v-else>关注</span> </div></a>
+              <div v-show="$route.path.indexOf('follows')!=-1">
                   <img src="~@/assets/Image/gous.svg" alt="">
                   <span>已关注</span></div>
              
           </div>
       </div>
-  </div> -->
-  
-</div>
+  </div>  
 </template>
 
 <script>
 //这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
 //例如：import 《组件名称》 from '《组件路径》';
-import {request} from '@/network/index.js'
-
-import userdetails from '@/content/userdetail/userdetail'
-
-import followsandfanscom from './commonprops/FollowsAndFansCom'
 
 export default {
 //import引入的组件需要注入到对象中才能使用
-components: {
-    userdetails,
-    followsandfanscom
-    
-},
+components: {},
 data() {
 //这里存放数据
 return {
-     profile:{},
-     follows:[]
-    
 
 };
+},
+props:{
+    follows:{
+        type:Array,
+        default(){
+            return []
+        }
+    }
 },
 //监听属性 类似于data概念
 computed: {},
@@ -72,26 +60,11 @@ computed: {},
 watch: {},
 //方法集合
 methods: {
-     async  getuserhomeData(){
-         const{data:res}=await request({url:'/user/detail',params:{cookie:window.localStorage.getItem('cookie'),uid:this.$route.query.id}})
-         console.log(res)
-          this.profile=res.profile
 
-    },
-   async getfollows(){
-    const{data:res}= await request({ url: "/user/follows",params: { cookie: window.localStorage.getItem("cookie"), uid: this.$route.query.id}})
-    console.log(res)
-    if(res.code==200){
-        this.follows=res.follow
-    }
-    }
-  
 },
 //生命周期 - 创建完成（可以访问当前this实例）
 created() {
-    this.getuserhomeData()
-    this.getfollows()
-  
+
 },
 //生命周期 - 挂载完成（可以访问DOM元素）
 mounted() {
@@ -107,29 +80,7 @@ activated() {}, //如果页面有keep-alive缓存功能，这个函数会触发
 }
 </script>
 <style  scoped>
-.user-fllows{
-    width: 950px;
-   min-height: 1000px;
-    background-color: #fff;
-    margin: 0 auto;
-}
-.user-fllows::before{
-    content: '';
-    display: table;
-
-}
-.tabbar{
-    width: 850px;
-    margin: 0 auto;
-    border-bottom: rgb(192,10,14) solid 2px;
-    padding-bottom: 5px;
-    margin-top: 40px;
-
-}
-.tabbar span{
-  font-size: 20px;
-}
-/* .follows-wrapper{
+.follows-wrapper{
     width: 850px;
     margin: 0 auto;
     min-height: 500px;
@@ -233,26 +184,36 @@ activated() {}, //如果页面有keep-alive缓存功能，这个函数会触发
     width: 75px;
     height: 60px;
 }
-.send-button{
+.sendbutton,.sendbuttonfans{
     width: 75px;
     height: 40px;
     background: url('~@/assets/Image/button.png') no-repeat 0 -803px;
     position: relative;
     margin-top: -5px;
 }
-.send-button span{
+.sendbuttonfans{
+    background-position: 0 -713px;
+
+}
+.sendbutton span,.sendbuttonfans span{
     position: absolute;
     top: 13.5px;
     left: 31px;
     font-size: 12px;
     color: rgba(0, 0, 0, 0.8);
 }
-.send-button:hover{
+.sendbuttonfans span{
+    color: white;
+}
+.sendbutton:hover{
     height: 35px;
     background-position: 0 -842px;
     margin-bottom: 5px;
 }
-.send-button:hover span{
+.sendbuttonfans:hover{
+    background-position: -79px -713px;
+}
+.sendbutton:hover span{
     top: 11px;
 }
 .item-right>div img{
@@ -270,5 +231,6 @@ activated() {}, //如果页面有keep-alive缓存功能，这个函数会触发
    
     
 
-} */
+}
+
 </style>

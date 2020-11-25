@@ -3,8 +3,9 @@
 <div class='user-event'>
   <userdetails :profile="profile"></userdetails>
   <div class="tabbar">
-      <span>粉丝()</span>
+      <span>粉丝({{followeds.length}})</span>
   </div>
+  <followsandfanscom :follows="followeds"></followsandfanscom>
   
 </div>
 </template>
@@ -16,17 +17,21 @@ import {request} from '@/network/index.js'
 
 import userdetails from '@/content/userdetail/userdetail'
 
+import followsandfanscom from './commonprops/FollowsAndFansCom'
 
 export default {
 //import引入的组件需要注入到对象中才能使用
 components: {
     userdetails,
+    followsandfanscom
+    
     
 },
 data() {
 //这里存放数据
 return {
      profile:{},
+     followeds:[]
     
 
 };
@@ -43,11 +48,20 @@ methods: {
           this.profile=res.profile
 
     },
+     async getfans(){
+      const{data:res}= await request({ url: "/user/followeds", params: { cookie: window.localStorage.getItem("cookie"),uid: this.$route.query.id,}})
+      console.log(res)
+      if(res.code==200){
+          this.followeds=res.followeds
+      }
+      
+    }
   
 },
 //生命周期 - 创建完成（可以访问当前this实例）
 created() {
     this.getuserhomeData()
+    this.getfans()
   
 },
 //生命周期 - 挂载完成（可以访问DOM元素）

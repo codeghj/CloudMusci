@@ -8,9 +8,11 @@
   },
   "dependencies": {
     "axios": "^0.20.0",
+    "china-area-data": "^5.0.1",
     "colorthief": "^2.3.2",
     "core-js": "^3.6.5",
     "element-ui": "^2.13.2",
+    "lodash": "^4.17.20",
     "swiper": "^5.3.6",
     "vue": "^2.6.11",
     "vue-awesome-swiper": "^4.1.1",

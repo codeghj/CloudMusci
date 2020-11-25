@@ -38,21 +38,44 @@ const routes = [
        children:[
          {
            path:'home',
-           component:()=>import('../views/home/homeprops/user/userProps/UserHome.vue')
+           component:()=>import('../views/home/homeprops/user/userProps/UserHome.vue'),
+           meta:{
+             requireauth:true
+           }
          },
          {
            path:'event',
-           component:()=>import('../views/home/homeprops/user/userProps/UserEvent.vue')
+           component:()=>import('../views/home/homeprops/user/userProps/UserEvent.vue'),
+           meta:{
+            requireauth:true
+          }
          },
          {
-           path:'fllows',
-           component:()=>import('../views/home/homeprops/user/userProps/UserFllows.vue')
+           path:'follows',
+           component:()=>import('../views/home/homeprops/user/userProps/UserFllows.vue'),
+           meta:{
+            requireauth:true
+          }
          },
          {
            path:'fans',
-           component:()=>import('../views/home/homeprops/user/userProps/UserFans.vue')
+           component:()=>import('../views/home/homeprops/user/userProps/UserFans.vue'),
+           meta:{
+            requireauth:true
+          }
+         },
+         {
+           path:'update',
+           component:()=>import('../views/home/homeprops/user/userProps/UserSetting.vue'),
+           meta:{
+            requireauth:true
+          }
          }
        ]
+     },
+     {
+       path:'/discover/toplist',
+       component:()=>import('../views/home/homeprops/topplaylist/TopPlayList.vue')
      }
 
     
@@ -66,6 +89,16 @@ const router = new VueRouter({
   routes,
   
 
+})
+router.beforeEach((to,from,next)=>{
+  if(to.meta.requireauth){
+    if(window.localStorage.getItem('loginstate')!=null){
+      next()
+    }else{
+      next('/')
+    }
+  }
+  next()
 })
 
 export default router

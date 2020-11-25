@@ -1,8 +1,6 @@
 <template>
   <div class="home">
-   <tabbar :lisdata="menuItem" @loginclick="loginclick" :profiles="profile" @toUserhome="toUserhome"></tabbar>
-  
-   
+   <tabbar :lisdata="menuItem" @loginclick="loginclick" :profiles="profile" @toUserhome="toUserhome" @exitmusci="exitmusci"></tabbar>
    <router-view></router-view>
    <el-dialog
    width="40%"
@@ -21,7 +19,7 @@
        <el-input v-model="data.phone"></el-input>
      </el-form-item>
      <el-form-item label="密码" prop="password" type="password">
-       <el-input v-model="data.password"></el-input>
+       <el-input v-model="data.password" show-password></el-input>
      </el-form-item>
       </el-form>
     </div>
@@ -112,9 +110,18 @@ export default {
       this.$store.commit('setloginsate',this.profile)
       window.localStorage.setItem('cookie',res.cookie)
       this.dialogVisible=false
+      this.$message.success('登录成功')
+      }else{
+        this.$message.error(res.message)
+
       }
       })
       }
+    },
+    exitmusci(){
+       if(Object.keys(this.profile).length!=0){
+         this.profile={}
+       }
     },
     digclose(){
         this.$refs.LoginForm.resetFields()

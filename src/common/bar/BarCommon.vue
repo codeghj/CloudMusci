@@ -49,11 +49,11 @@ export default {
                   this.$router.push('/discover')
                   break;
               case 1:
-                
+                   this.$router.push('/discover/toplist')
+                   console.log(1)
                   break;
               case 2:
                    this.$router.push('/discover/playlist')
-                   console.log(1)
                    break;
               case 5:
                   this.$router.push('/discover/album')     
