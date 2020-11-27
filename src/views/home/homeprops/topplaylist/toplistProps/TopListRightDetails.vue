@@ -43,7 +43,30 @@
                   <div class="time">时长</div>
                   <div class="song-name">歌手</div>
               </div>
-              <songlistitem :songitem="song[0]"></songlistitem>
+              <songlistitem  v-for="(item,index) in song" :songitem="item" :key="item.id" :index="index" :class="{songliststyle:index<3,songliststyle1:index>=3}"></songlistitem>
+          </div>
+          <div class="details-comments">
+              <div class="comment-header">
+                  <span>评论</span>
+                  <span>共{{toplistdetails.commentCount}}评论</span>
+              </div>
+              <div class="publish-comment">
+
+              </div>
+              <div class="hot-comment" v-if="isshow">
+                  <span>精彩评论</span>
+              </div>
+              <div class="hots-comment-wrapper" v-if="isshow">
+                   <commentitem v-for="(item,index) in  hotcomment " :commentdata="item" :key="index"  class="hots-comment"></commentitem>
+              </div>
+             
+              <div class="new-comment">
+                  <span>最新评论({{toplistdetails.commentCount}})</span>
+              </div>
+              <div class="new-comment-wrapper">
+                   <commentitem v-for="(item,index) in  newcomment " :commentdata="item" :key="index+1000" class="news-comment"></commentitem>
+              </div>
+                <slot name="pagination"></slot>
           </div>
 
     </div>
@@ -56,15 +79,17 @@
 import {time} from '@/utils/time.js'
  
 import songlistitem from './SongListItem'
+import commentitem from './CommentItem'
 export default {
 //import引入的组件需要注入到对象中才能使用
 components: {
-    songlistitem
+    songlistitem,
+    commentitem
 },
 data() {
 //这里存放数据
 return {
-
+  
 };
 },
 props:{
@@ -79,10 +104,29 @@ props:{
         default(){
             return []
         }
+    },
+    hotcomment:{
+        type:Array,
+        default(){
+            return []
+        }
+    },
+    newcomment:{
+        type:Array,
+        default(){
+            return []
+        }
+    },
+    pagenum:{
+        type:Number
     }
 },
 //监听属性 类似于data概念
-computed: {},
+computed: {
+    isshow(){
+        return this.pagenum>1?false:true
+    }
+},
 //监控data中的数据变化
 watch: {},
 filters:{
@@ -101,6 +145,7 @@ created() {
 },
 //生命周期 - 挂载完成（可以访问DOM元素）
 mounted() {
+    
 
 },
 beforeCreate() {}, //生命周期 - 创建之前
@@ -256,9 +301,15 @@ activated() {}, //如果页面有keep-alive缓存功能，这个函数会触发
 .info-option a:last-child:hover{
     background-position: 0 -1507px;
 }
+.tabber-details{
+    border:1px solid #ccc;
+    border-top: none;
+    margin-bottom: 30px;
+}
 .tabber-details-hedaer{
     width: 100%;
     display: flex;
+   
     align-items: center;
 }
 .contain-left{
@@ -287,7 +338,7 @@ activated() {}, //如果页面有keep-alive缓存功能，这个函数会触发
     height: 42px;
     line-height: 42px;
     background: rgb(247,247,247);
-    border: solid 1px #ccc;
+     border-bottom: 1px solid #ccc;
     border-top: 3px solid rgb(212,12,12);
     display: flex;
 }
@@ -314,5 +365,54 @@ activated() {}, //如果页面有keep-alive缓存功能，这个函数会触发
     padding-left: 10px;
      border-left: 1px solid #ccc;
     flex: 2;
+}
+.songliststyle{
+    min-height: 80px;
+    align-items: center;
+
+}
+.songliststyle1{
+   align-items: center;
+    min-height: 40px;
+}
+.tabber-details .song-list-item:nth-child(even){
+    background-color: rgb(247,247,247);
+}
+.comment-header{
+    padding-bottom: 10px;
+    border-bottom: 2px solid rgb(192,10,14);
+}
+.comment-header span:first-child{
+    font-size: 20px;
+    font-weight: bold;
+}
+.comment-header span:last-child{
+    font-size: 13px;
+    color: rgba(0,0,0,0.7);
+    margin-left: 20px;
+}
+.publish-comment{
+    height: 200px;
+}
+.hot-comment,.new-comment{
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 2px;
+}
+.hot-comment span,.new-comment span{
+    font-size: 10px;
+    font-weight: 600;
+}
+.hots-comment-wrapper>div:not(:last-child),.new-comment-wrapper>div:not(:last-child) {
+    border-bottom: 1px solid #ccc;
+}
+.new-comment{
+    margin-top: 50px;
+}
+.el-pagination{
+    width: 400px;
+    margin: 0 auto;
+    font-size: 20px;
+    height: 80px;
+    
 }
 </style>

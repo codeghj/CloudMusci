@@ -4,7 +4,18 @@
 <barcommon :barItem="barItem" class="play-list-bar"></barcommon>
    <div class="top-pay-list-wrapper">
       <leftabbar :toplist="toplist" :pretoplist="pretoplist" :backtoplist="backtoplist" @selectItem="selectItem" @backselectItem="backselectItem"></leftabbar> 
-      <rightdetails :toplistdetails=" toplistdetails" :song="song"></rightdetails>
+      <rightdetails :toplistdetails=" toplistdetails" :song="song" :hotcomment="hotcomment" :newcomment="newcomment" :pagenum="pagenum">
+          <div class="playlistpage-pagination" slot="pagination">
+            <el-pagination
+             :bacground= "true"
+             :page-size="query.limit"
+             layout="prev, pager, next"
+             :current-page="getpage"
+             @current-change="handleCurrentChange"
+            :total="total">
+           </el-pagination>
+          </div>
+      </rightdetails>
       
 </div> 
 </div>
@@ -34,27 +45,66 @@ return {
    pretoplist:[],
    backtoplist:[],
    toplistdetails:{},
-   song:[]
+   song:[],
+   hotcomment:[],
+   newcomment:[],
+   param:{
+       id:0,
+       type:2,
+       sortType:2,
+       pageNo:1,
+       pageSize:20,
+       cursor:0
+      
+
+   },
+   query:{
+       id:0,
+       offset:0,
+       limit:20,
+   },
+   total:0,
+   pagenum:1
 };
 },
 //监听属性 类似于data概念
-computed: {},
+computed: {
+    getpage(){
+        return this.query.offset/this.query.limit+1
+    }
+},
 //监控data中的数据变化
 watch: {
     toplist(){
         if(this.$route.query.id!=null){
             this.getdetailstoplist(this.$route.query.id)
+             this.param.id=this.$route.query.id
+             this.query.id=this.$route.query.id
+             this.getcommenthot()
+             this.getcommenttoplist()
             return
         }
         this.getdetailstoplist(this.toplist[0].id)
+        this.param.id=this.toplist[0].id
+        this.query.id=this.toplist[0].id
+        this.getcommenthot()
+        this.getcommenttoplist()
     },
     $route:{
          handler(){
              if(this.$route.query.id!=null){
                  this.getdetailstoplist(this.$route.query.id)
+                this.param.id=this.$route.query.id
+                this.query.id=this.$route.query.id
+                this.getcommenthot()
+                this.getcommenttoplist()
              return 
              }
              this.getdetailstoplist(this.toplist[0].id)
+             this.param.id=this.toplist[0].id
+             this.query.id=this.toplist[0].id
+             this.getcommenthot()
+             this.getcommenttoplist()
             
          },
         
@@ -82,11 +132,32 @@ methods: {
           this.song=res.playlist.tracks
     }
     },
+    async getcommenttoplist(){
+      const{data:res}= await request({url:'/comment/playlist',params:this.query})
+      console.log(res)
+      if(res.code==200){
+       this.newcomment=res.comments
+       this.total=res.total
+       
+      }
+    },
+    async getcommenthot(){
+       const{data:res}=await request({url:'/comment/new',params:this.param})
+       console.log(res)
+       if(res.code==200){
+        this.hotcomment=res.data.comments
+       }
+    },
     selectItem(items){
         this.$router.push({path:'/discover/toplist',query:{id:items.id}})
     },
     backselectItem(items){
         this.$router.push({path:'/discover/toplist',query:{id:items.id}})
+    },
+    handleCurrentChange(val){
+     this.query.offset=(val-1)*this.query.limit
+     this.getcommenttoplist()
+     this.pagenum=val
     }
 
 
