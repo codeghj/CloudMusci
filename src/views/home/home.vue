@@ -1,7 +1,9 @@
 <template>
   <div class="home">
    <tabbar :lisdata="menuItem" @loginclick="loginclick" :profiles="profile" @toUserhome="toUserhome" @exitmusci="exitmusci"></tabbar>
-   <router-view></router-view>
+    <playdivce class="playdivce" :class="{showplaydivce:isactive}" @mouseenter.native="changactive()" @mouseleave.native="changactives()"></playdivce>
+   
+   <router-view v-if="isRouterAlive"></router-view>
    <el-dialog
    width="40%"
    title="登录"
@@ -28,16 +30,13 @@
     <el-button type="primary" @click="Logintrue()">确 定</el-button>
   </span>
  </el-dialog>
-   
+  
   </div>
 </template>
 
 <script type="text/javascript">
 import tabbar from "@/content/tabbar/Tabbar"
-
-
-
-
+import playdivce from '@/common/playdivce/PlayDivce'
 
 import {request} from '@/network/index.js'
 export default {
@@ -45,6 +44,11 @@ export default {
     
     this.getHomemessage()
     
+  },
+  provide(){
+    return{
+      reload:this.reload
+    }
   },
   data() {
     return {
@@ -57,7 +61,7 @@ export default {
         "音乐人",
         "下载客户端"
       ],
-     
+      isRouterAlive:true,
       dialogVisible:false,
       data:{
         phone:'',
@@ -73,15 +77,22 @@ export default {
             { min: 6, max: 20, message: '长度在 6到20个字符', trigger: 'blur' }
           ],
        },
-       profile:{}
+       profile:{},
+       isactive:false
       
      
     };
   },
   components: {
      tabbar,
+     playdivce
     
      
+  },
+  computed:{
+    getheight(){
+     
+    }
   },
   methods: {
   
@@ -129,6 +140,29 @@ export default {
     },
     toUserhome(){
       this.$router.push({path:'/user/home',query:{id:JSON.parse(window.localStorage.getItem('loginstate')).userId }})
+    },
+    changactive(){
+      this.isactive=true
+    },
+    changactives(){
+     setTimeout(()=>{
+     this.isactive=false
+     },2000)
+    },
+    debounce(time,fnc){
+       let times=null
+       return function(){
+         if(times!=null) clearTimeout(time)
+         times=setTimeout(()=>{
+               fnc.apply(this,arguments)
+         },time)
+       }
+    },
+    reload(){
+        this.isRouterAlive=false
+        this.$nextTick(()=>{
+          this.isRouterAlive=true
+        })
     }
     
   },
@@ -166,4 +200,17 @@ export default {
 .form{
   margin-left: -20px;
 }
+.playdivce{
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  z-index: 999;
+  height: 10px;
+   transition:  height 1s;
+}
+.showplaydivce{
+  height: 70px;
+  transition:  height 1s;
+}
+
 </style>

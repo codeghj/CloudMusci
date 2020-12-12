@@ -4,7 +4,7 @@
 <barcommon :barItem="barItem" class="play-list-bar"></barcommon>
    <div class="top-pay-list-wrapper">
       <leftabbar :toplist="toplist" :pretoplist="pretoplist" :backtoplist="backtoplist" @selectItem="selectItem" @backselectItem="backselectItem"></leftabbar> 
-      <rightdetails :toplistdetails=" toplistdetails" :song="song" :hotcomment="hotcomment" :newcomment="newcomment" :pagenum="pagenum">
+      <rightdetails :toplistdetails=" toplistdetails" :song="song" :hotcomment="hotcomment" :newcomment="newcomment" :pagenum="pagenum" :toplist="toplist">
           <div class="playlistpage-pagination" slot="pagination">
             <el-pagination
              :bacground= "true"

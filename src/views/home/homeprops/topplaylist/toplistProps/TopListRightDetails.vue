@@ -51,20 +51,36 @@
                   <span>共{{toplistdetails.commentCount}}评论</span>
               </div>
               <div class="publish-comment">
-
+                <div class="avator-img">
+                    <img :src="profile.avatarUrl" alt="">
+                </div>
+                <div class="publish-comment-form">
+                    <el-form ref="forms" :model="form" >
+                       <el-form-item prop="content">
+                        <el-input  type="textarea"  maxlength="140"  show-word-limit placeholder="评论"  v-model="form.content"></el-input>
+                        </el-form-item>
+                    </el-form>
+                    <div class="option">
+                        <!-- <div class="select-emoji"></div>
+                        <div class="select-friend"></div> -->
+                        <div class="submit">
+                           <el-button type="primary" size="mini" @click.native="publishcomment()">发表</el-button>
+                        </div>
+                    </div>
+                </div>
               </div>
               <div class="hot-comment" v-if="isshow">
                   <span>精彩评论</span>
               </div>
               <div class="hots-comment-wrapper" v-if="isshow">
-                   <commentitem v-for="(item,index) in  hotcomment " :commentdata="item" :key="index"  class="hots-comment"></commentitem>
+                   <commentitem v-for="(item,index) in  hotcomment " @replypublishcomment="replypublishcomment" :commentdata="item" :key="index"  class="hots-comment" :toplist="toplist"></commentitem>
               </div>
              
               <div class="new-comment">
                   <span>最新评论({{toplistdetails.commentCount}})</span>
               </div>
               <div class="new-comment-wrapper">
-                   <commentitem v-for="(item,index) in  newcomment " :commentdata="item" :key="index+1000" class="news-comment"></commentitem>
+                   <commentitem v-for="(item,index) in  newcomment " @deletecomment="deletecomment" @replypublishcomment="replypublishcomment" :commentdata="item" :key="index+1000" class="news-comment" :toplist="toplist"></commentitem>
               </div>
                 <slot name="pagination"></slot>
           </div>
@@ -80,16 +96,38 @@ import {time} from '@/utils/time.js'
  
 import songlistitem from './SongListItem'
 import commentitem from './CommentItem'
+import { request } from '../../../../../network'
 export default {
 //import引入的组件需要注入到对象中才能使用
 components: {
     songlistitem,
     commentitem
 },
+inject:['reload'],
 data() {
 //这里存放数据
 return {
-  
+  profile:{},
+  form:{
+      type:2,
+      t:1,
+      content:'',
+      id:0,
+      cookie: window.localStorage.getItem("cookie")
+  },
+  deletecommentparamms:{
+      type:2,
+      t:0,
+      id:0,
+      commentId:0,
+      cookie: window.localStorage.getItem("cookie")
+  },
+  rules:{
+      content:[
+           { required: true, message: '请输入评论', trigger: 'blur' },
+            { min: 0, max: 140, message: '长度在 0 到 140 个字符', trigger: 'blur' }
+      ]
+  }
 };
 },
 props:{
@@ -97,6 +135,12 @@ props:{
         type:Object,
         default(){
             return {}
+        }
+    },
+    toplist:{
+        type:Array,
+        default(){
+            return []
         }
     },
     song:{
@@ -137,11 +181,74 @@ filters:{
 },
 //方法集合
 methods: {
+    async getprofile(){
+       const{data:res}=await request({url:'/user/detail',params:{cookie: window.localStorage.getItem("cookie"), uid: JSON.parse(window.localStorage.getItem('loginstate')).userId}})
+       console.log(res)
+       if(res.code==200){
+        this.profile=res.profile
+       }
+    },
+    publishcomment(){
+        if(this.$route.query.id!=null){
+            this.form.id=this.$route.query.id
+        }
+        this.form.id=this.toplist[0].id
+        this.$refs.forms.validate(async(valid)=>{
+        const{data:res}= await request({url:'/comment',params:this.form})
+      console.log(res)
+      if(res.code==200){
+          this.$message.success('发表评论成功')
+          this.newcomment.unshift(res.comment)
+          
+      }
+        })
+        this.$refs.forms.resetFields()
+     
+    },
+    replypublishcomment(res){
+       this.newcomment.unshift(res.comment)
+       console.log(this.newcomment)
+       this.$message.success('发表评论成功')
+    },
+     deletecomment(id){
+        console.log(id)
+         this.$confirm('此操作将永久删除该评论, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(async() => {
+         if(this.$route.query.id!=null){
+            this.deletecommentparamms.id=this.$route.query.id
+        }
+        this.deletecommentparamms.id=this.toplist[0].id
+        this.deletecommentparamms.commentId=id
+        const{data:res}=  await request({url:'/comment',params:this.deletecommentparamms})
+        console.log(res)
+        if(res.code==200){
+           let index= this.newcomment.findIndex(item=>item.commentId==id)
+           this.newcomment.splice(index,1)
+           this.reload()
+           console.log(index)
+            this.$message({
+            type: 'success',
+            message: '删除成功!'
+          });
+        }
+          
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          });          
+        });
+        
+
+    }
 
 },
 //生命周期 - 创建完成（可以访问当前this实例）
 created() {
-
+    this.getprofile()
 },
 //生命周期 - 挂载完成（可以访问DOM元素）
 mounted() {
@@ -414,5 +521,25 @@ activated() {}, //如果页面有keep-alive缓存功能，这个函数会触发
     font-size: 20px;
     height: 80px;
     
+}
+.publish-comment{
+    align-items: center;
+    display: flex;
+}
+.avator-img img{
+ width: 80px;
+ height: 80px;
+}
+.publish-comment-form{
+    min-height: 80px;
+    margin-left: 15px;
+    flex: 1;
+}
+.el-form{
+    margin-top: 33px;
+}
+.submit{
+    float: right;
+    margin: 0;
 }
 </style>

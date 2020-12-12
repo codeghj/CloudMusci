@@ -146,7 +146,7 @@ export default {
       },
       exitmusci(){
           if(window.localStorage.getItem('loginstate')){
-              this.$emit('exitmusci')
+            //   this.$emit('exitmusci')
               window.localStorage.removeItem('loginstate')
               window.localStorage.removeItem('cookie')
               this.loginstate={}
@@ -155,7 +155,6 @@ export default {
               this.profiles={}
               console.log(this.profiles)
               console.log(this.loginstate)
-              this.$forceUpdate()
               if(this.$route.meta.requireauth){
                    this.$router.push('/')
               }

@@ -147,6 +147,9 @@ activated() {}, //如果页面有keep-alive缓存功能，这个函数会触发
      font-size: 13px;
     padding-left: 10px;
     flex: 2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 .song-name a{
     text-decoration: none;
